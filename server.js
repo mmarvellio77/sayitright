@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const cache = {}; // simple cache: same word = no new API call
+
 // Look up a word in the Free Dictionary API
 app.get("api/define", async (req, res) => {
   const word = (req.query.word || "").trim().toLowerCase();
@@ -9,6 +11,7 @@ app.get("api/define", async (req, res) => {
       error: "Please type a word using letters only.",
     });
   }
+  if (cache[word]) return res.json(cache[word]);
 
   try {
     const response = await fetch(
@@ -40,6 +43,7 @@ app.get("api/define", async (req, res) => {
         example: m.definitions[0].example || "",
       })),
     };
+    cache[word] = result;
   } catch (err) {
     console.error(err.message);
     res.status(502).json({
