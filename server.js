@@ -1,8 +1,18 @@
 require("dotenv").config();
 const express = require("express");
+const os = require("os");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SERVER_NAME = process.env.SERVER_NAME || os.hostname();
 const cache = {}; // simple cache: same word = no new API call
+
+//Tell the browser which server answered(to see the load balancer working)
+app.use((req, res, next) => {
+  res.set("X-Served-By", SERVER_NAME);
+  next();
+});
+
+app.use(express.static("public"));
 
 // Look up a word in the Free Dictionary API
 app.get("api/define", async (req, res) => {
@@ -75,7 +85,11 @@ app.get("/api/translate", async (req, res) => {
   }
 });
 
-app.use(express.static("public"));
+//Health check used by the load balancer
+app.get("/api/health", (req, res) =>
+  res.json({ status: "ok", server: SERVER_NAME }),
+);
+
 app.listen(PORT, () =>
   console.log(
     "SayItRight is running on http://localhost:${PORT} (${SERVER_NAME})",
