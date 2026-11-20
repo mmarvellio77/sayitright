@@ -1,0 +1,136 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f5fb;
+  color: #222;
+  margin: 0;
+}
+header {
+  background: #4f46e5;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+header h1 {
+  margin: 0;
+}
+header p {
+  margin: 5px 0;
+}
+main {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 16px;
+}
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+input,
+select,
+button {
+  font-size: 16px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+button {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+button:hover {
+  background: #3730a3;
+}
+#search-form {
+  display: flex;
+  gap: 10px;
+}
+#search-input {
+  flex: 1;
+}
+.hint button {
+  background: #e0e0f8;
+  color: #333;
+  margin: 3px;
+  padding: 4px 10px;
+}
+#word {
+  font-size: 36 px;
+  margin: 0;
+}
+#phonetic {
+  color: #666;
+}
+.meaning {
+  border-top: 1px solid #eee;
+  padding: 8px 0;
+}
+.meaning em {
+  color: #666;
+}
+.practice {
+  background: #f4f5fb;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+  text-align: center;
+}
+#mic-btn {
+  font-size: 20px;
+  padding: 14px 24 px;
+  border-radius: 30px;
+}
+#mic-btn.listening {
+  background: #dc2626;
+}
+#result {
+  font-size: 18px;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+.good {
+  color: green;
+  font-weight: bold;
+}
+.bad {
+  color: #dc2626;
+  font-weight: bold;
+}
+.error {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px;
+  border-radius: 6px;
+}
+.warning {
+  background: #fef3c7;
+  padding: 10px;
+  border-radius: 6px;
+}
+.hidden {
+  display: none;
+}
+footer {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+  font-size: 14px;
+}
