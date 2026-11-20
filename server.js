@@ -53,6 +53,27 @@ app.get("api/define", async (req, res) => {
   }
 });
 
+// Translate a word with the MyMemory API
+app.get("/api/translate", async (req, res) => {
+  const text = (req.quert.text || "").trim();
+  const lang = req.query.lang;
+  if (!text || !lang)
+    return res.status(400).json({ error: "Missing text or language." });
+
+  try {
+    let url =
+      "https://api.mymemory.translated.net/get?q=$(encodeURIComponent(text)}&langpair=en|${lang}";
+    if (process.env.MYMEMORY_EMAIL) url += "&de" + process.env.MYMEMORY_EMAIL;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.responseStatus != 200) throw new Error(data.responseDetails);
+    res.json({ translation: data.responseData.translatedText });
+  } catch (err) {
+    console.error(err.message);
+    res.status(502).json({ error: "Translation is not available right now." });
+  }
+});
+
 app.use(express.static("public"));
 app.listen(PORT, () =>
   console.log(
