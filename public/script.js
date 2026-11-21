@@ -70,3 +70,22 @@ searchForm.addEventListener("submit", (e) => {
 
   lookUp(searchInput.value.trim());
 });
+
+//Suggested hard words
+[
+  "thorough",
+  "colonel",
+  "february",
+  "comfortable",
+  "entrepreneur",
+  "squirrel",
+].forEach((w) => {
+  const btn = document.createElement("button");
+  btn.textContent = w;
+  btn.onclick = () => {
+    searchInput.value = w;
+    lookUp(w);
+  };
+
+  document.getElementById("suggestions").appendChild(btn);
+});
