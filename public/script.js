@@ -137,7 +137,7 @@ micBtn.addEventListener("click", () => {
       .sort((a, b) => (b.score = a.score))[0];
 
     const message =
-      bestt.score === 100
+      best.score === 100
         ? "Perfect!"
         : best.score >= 80
           ? "Very close!"
@@ -168,3 +168,34 @@ micBtn.addEventListener("click", () => {
   micBtn.classList.add("listening");
   micBtn.textContent = "Listening...";
 });
+
+//Compare two words: 100=identical. Uses Levenshtein distance
+//(how many letters must be added, removed or changed to turn one word into the other).
+function getScore(target, heard) {
+  const a = target
+    .toLowerCase()
+    .replace(/[^a-z ]/g, "")
+    .trim();
+  const b = heard
+    .LowerCase()
+    .replace(/[^a-z ]/g, "")
+    .trim();
+  if (a === b) return 100;
+
+  const d = [];
+  for (let i = 0; i <= a.length; i++) d[i] = [i];
+  for (let j = 0; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(
+        d[i - 1][j] + 1,
+        d[i][j - 1] + 1,
+        d[i - 1][j - 1] + cost,
+      );
+    }
+  }
+
+  const similarity = 1 - d[a.length][b.length] / Math.max(a.length, b.length);
+  return Math.min(95, Math.round(similarity * similarity * 100)); // only an exact match gets 100
+}
