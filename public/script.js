@@ -104,3 +104,19 @@ function speak(text) {
   voice.lang = "en-US";
   speechSynthesis.speak(voice);
 }
+
+// ----------3. Translate ----------
+document.getElementById("lang").addEventListener("change", async (e) => {
+  const output = document.getElementById("translation");
+  if (!e.target.value) return (output.textContent = "");
+  output.textContent = "Translating...";
+  try {
+    const response = await fetch(
+      `/api/translate?text=${encodeURIComponent(currentWord.word)}&lang=${e.target.value}`,
+    );
+    const data = await response.json();
+    output.textContent = response.ok ? data.translation : data.error;
+  } catch {
+    output.textContent = "Translation failed.";
+  }
+});
