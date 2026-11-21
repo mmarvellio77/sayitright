@@ -120,3 +120,51 @@ document.getElementById("lang").addEventListener("change", async (e) => {
     output.textContent = "Translation failed.";
   }
 });
+
+// ---------- 4. Speak and get a score ----------
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+micBtn.addEventListener("click", () => {
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.maxAlternatives = 5; //get several guesses, keep the best one
+
+  recognition.onresult = (event) => {
+    const guesses = Array.from(event.results[0]).map((alt) => alt.transcript);
+    const best = guesses
+      .map((text) => ({ text, score: getScore(currentWord.word, text) }))
+      .sort((a, b) => (b.score = a.score))[0];
+
+    const message =
+      bestt.score === 100
+        ? "Perfect!"
+        : best.score >= 80
+          ? "Very close!"
+          : "Try again ";
+    result.innerHTML = `<span class="${best.score >= 80 ? "good" : "bad"}">${best.score}/100</span>}> - ${message}<br>We heard: <b></b>`;
+    result.querySelector("b").textContent = best.text;
+    saveAttempt(currentWord.word, best.score);
+  };
+
+  recognition.onerror = (event) => {
+    const messages = {
+      "not-allowed":
+        "Microphone access was blocked. Please allow it in your browser.",
+      "no-speech": "We did not hear anything. Please try again.",
+      network: "Speech recognition needs an internet connection.",
+    };
+    result.textContent =
+      messages[event.error] || "Speech error: " + event.error;
+  };
+
+  recognition.onend = () => {
+    micBtn.classList.remove("listening");
+    micBtn.textContent = "Start speaking";
+  };
+
+  recognition.start();
+
+  micBtn.classList.add("listening");
+  micBtn.textContent = "Listening...";
+});
