@@ -5,7 +5,7 @@ const errorBox = document.getElementById("error");
 const loading = document.getElementById("loading");
 const wordBox = document.getElementById("word-box");
 
-let currenrWord = null; // the word the user is practising
+let currentWord = null; // the word the user is practising
 
 //----------1. Look up a word----------
 async function lookUp(word) {
@@ -89,3 +89,18 @@ searchForm.addEventListener("submit", (e) => {
 
   document.getElementById("suggestions").appendChild(btn);
 });
+// ----------2. Listen ----------
+document.getElementById("listen-btn").addEventListener("click", () => {
+  if (currentWord.audio) {
+    //Play the real recording; if it fails, use the browser's voice
+    new Audio(currentWord.audio).play().catch(() => speak(currentWord.word));
+  } else {
+    speak(currentWord.word);
+  }
+});
+
+function speak(text) {
+  const voice = new SpeechSynthesisUtterance(text);
+  voice.lang = "en-US";
+  speechSynthesis.speak(voice);
+}
