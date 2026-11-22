@@ -11,18 +11,57 @@ let currentWord = null; // the word the user is practising
 
 //----------1. Look up a word----------
 async function lookUp(word) {
+  word = word.trim().toLowerCase();
   errorBox.classList.add("hidden");
+
+  if (!/^[a-z' -]{1,40}$/.test(word)) {
+    return showError("Please type a word using letters only.");
+  }
+
+  // Ask our server which web server is answering (to see the load balancer working)
+  fetch("/api/health")
+    .then(showServer)
+    .catch(() => {});
+
+  if (cache[word]) {
+    currentWord = cache[word];
+    return showWord(currentWord);
+  }
 
   loading.classList.remove("hidden");
   try {
     const response = await fetch(
-      "/api/define?word=" + encodeURIComponent(word),
+      "https://api.dictionaryapi.dev/api/v2/entries/en/" +
+        encodeURIComponent(word),
     );
+    if (response.status === 404) {
+      throw new Error(`"${word}" was not found. Check the spelling.`);
+    }
     showServer(response);
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error);
-    currentWord = data;
-    showWord(data);
+    if (!response.ok) {
+      throw new Error(
+        "The dictionary service is not responding. Please try again later.",
+      );
+    }
+    // Keep only what the page needs
+    const entry = (await response.json())[0];
+    currentWord = {
+      word: entry.word,
+      phonetic:
+        entry.phonetic ||
+        (entry.phonetics.find((p) => p.text) || {}).text ||
+        "",
+      audio: (entry.phonetics.find((p) => p.audio) || {}).audio || "",
+      meanings: entry.meanings.map((m) => ({
+        partOfSpeech: m.partOfSpeech,
+        definition: m.definitions[0].definition,
+        example: m.definitions[0].example || "",
+      })),
+    };
+
+    cache[word] = currentWord;
+    showWord(currentWord);
   } catch (err) {
     //err.message is our server's message, or a network error
     showError(
@@ -71,7 +110,7 @@ function showError(message) {
 // Show which server(web-01/web-02) answered
 function showServer(response) {
   const name = response.headers.get("X-Served-By");
-  if (name) document.getElementById("server").textContent = "Served by" + name;
+  if (name) document.getElementById("server").textContent = "Served by " + name;
 }
 
 searchForm.addEventListener("submit", (e) => {
