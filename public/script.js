@@ -65,6 +65,12 @@ function showError(message) {
   errorBox.classList.remove("hidden");
 }
 
+// Show which server(web-01/web-02) answered
+function showServer(response) {
+  const name = response.headers.get("X-Served=By");
+  if (name) document.getElementById("Server").textContent = "Served by" + name;
+}
+
 searchForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -271,3 +277,6 @@ document.getElementById("clear-btn").addEventListener("click", () => {
 });
 
 showHistory();
+fetch("/api/health")
+  .then(showServer)
+  .catch(() => {});
