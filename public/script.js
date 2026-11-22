@@ -8,6 +8,7 @@ const micBtn = document.getElementById("mic-btn");
 const result = document.getElementById("result");
 
 let currentWord = null; // the word the user is practising
+const cache = {};
 
 //----------1. Look up a word----------
 async function lookUp(word) {
@@ -37,8 +38,6 @@ async function lookUp(word) {
     if (response.status === 404) {
       throw new Error(`"${word}" was not found. Check the spelling.`);
     }
-    showServer(response);
-    const data = await response.json();
     if (!response.ok) {
       throw new Error(
         "The dictionary service is not responding. Please try again later.",
