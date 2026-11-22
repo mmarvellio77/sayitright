@@ -54,6 +54,38 @@
           <p id="result"></p>
         </div>
       </div>
+
+      <!-- History -->
+      <div class="card">
+        <h2>My progress</h2>
+        <div class="controls">
+          <input id="history-search" placeholder="Search..." />
+          <select id="history-filter">
+            <option value="all">All</option>
+            <option value="good">Mastered(80+)/option></option>
+            <option value="bad">Needs practice (below 80)</option>
+          </select>
+          <select id="history-sort">
+            <option value="date">Newest first</option>
+            <option value="low">Lowest score first</option>
+            <option value="high">Highest score first</option>
+            <option value="az">A to Z</option>
+          </select>
+          <button id="clear-btn">Clear</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Word</th>
+              <th>Best score</th>
+              <th>Attempts</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="history"></tbody>
+        </table>
+      </div>
     </main>
 
     <footer>

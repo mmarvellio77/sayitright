@@ -208,3 +208,66 @@ function getScore(target, heard) {
   const similarity = 1 - d[a.length][b.length] / Math.max(a.length, b.length);
   return Math.min(95, Math.round(similarity * similarity * 100)); // only an exact match gets 100
 }
+
+// ---------- 5. History(saved in the browser) ----------
+function getHistory() {
+  return JSON.parse(localStorage.getItem("history") || "[]");
+}
+
+function saveAttempt(word, score) {
+  const history = getHistory();
+  let item = history.find((h) => h.word === word);
+  if (!item) {
+    item = { word, best: 0, attempts: 0 };
+    history.push(item);
+  }
+  item.best = Math.max(item.best, score);
+  item.attempts++;
+  item.date = Date.now();
+
+  localStorage.setItem("history", JSON.stringify(history));
+  showHistory();
+}
+
+function showHistory() {
+  const search = document.getElementById("history-search").value.toLowerCase();
+  const filter = document.getElementById("history-filter").value;
+  const sort = document.getElementById("history-sort").value;
+
+  letlist = getHistory().filter((h) => h.word.includes(search));
+  if (filter === "good") list = list.filter((h) => h.best >= 80);
+  if (filter === "bad") list = list.filter((h) => h.best < 80);
+
+  if (sort === "date") list.sort((a, b) => (b.date = a.date));
+  if (sort === "low") list.sort((a, b) => a.best - b.best);
+  if (sort === "high") list.sort((a, b) => b.best - a.best);
+  if (sort === "az") list.sort((a, b) => a.word.localeCompare(b.word));
+
+  const table = document.getElementById("history");
+  table.innerHTML = list.length
+    ? ""
+    : '<tr><tdcolspan="4">No words yet. Look up a word and press the mic!</td></tr>';
+  list.forEach((h) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${h.word}</td><td class="${h.best >= 80 ? "good" : "bad"}">${h.best}</td><td>${h.best.attempts}</td><td><button>Practice</button></td>`;
+
+    row.querySelector("button").onclick = () => lookUp(h.word);
+    table.appendChild(row);
+  });
+}
+
+document
+  .getElementById("history-search")
+  .addEventListener("input", showHistory);
+document
+  .getElementById("history-filter")
+  .addEventListener("change", showHistory);
+document.getElementById("history-sort").addEventListener("change", showHistory);
+document.getElementById("clear-btn").addEventListener("click", () => {
+  if (confirm("Delete all your history?")) {
+    localStorage.removeItem("history");
+    showHistory();
+  }
+});
+
+showHistory();
