@@ -62,6 +62,7 @@ async function lookUp(word) {
     cache[word] = currentWord;
     showWord(currentWord);
   } catch (err) {
+    wordBox.classList.add("hidden"); //don't show the previous word under the error
     //err.message is our server's message, or a network error
     showError(
       err.message === "Failed to fetch"
@@ -122,7 +123,7 @@ searchForm.addEventListener("submit", (e) => {
 [
   "thorough",
   "colonel",
-  "february",
+  "vegetable",
   "comfortable",
   "entrepreneur",
   "squirrel",
