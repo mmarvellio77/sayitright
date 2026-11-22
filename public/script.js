@@ -125,6 +125,15 @@ document.getElementById("lang").addEventListener("change", async (e) => {
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 
+if (!SpeechRecognition) {
+  micBtn.disabled = true;
+
+  document.getElementById("warning").textContent =
+    "Speaking practice only works in Google Chrome or Microsoft Edge.";
+
+  document.getElementById("warning").classList.remove("hidden");
+}
+
 micBtn.addEventListener("click", () => {
   const recognition = new SpeechRecognition();
   recognition.lang = "en-US";
@@ -177,7 +186,7 @@ function getScore(target, heard) {
     .replace(/[^a-z ]/g, "")
     .trim();
   const b = heard
-    .LowerCase()
+    .toLowerCase()
     .replace(/[^a-z ]/g, "")
     .trim();
   if (a === b) return 100;
