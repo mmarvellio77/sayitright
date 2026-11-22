@@ -4,6 +4,8 @@ const searchInput = document.getElementById("search-input");
 const errorBox = document.getElementById("error");
 const loading = document.getElementById("loading");
 const wordBox = document.getElementById("word-box");
+const micBtn = document.getElementById("mic-btn");
+const result = document.getElementById("result");
 
 let currentWord = null; // the word the user is practising
 
@@ -29,6 +31,7 @@ async function lookUp(word) {
         : err.message,
     );
   }
+  loading.classList.add("hidden");
 }
 
 function showWord(data) {
@@ -67,8 +70,8 @@ function showError(message) {
 
 // Show which server(web-01/web-02) answered
 function showServer(response) {
-  const name = response.headers.get("X-Served=By");
-  if (name) document.getElementById("Server").textContent = "Served by" + name;
+  const name = response.headers.get("X-Served-By");
+  if (name) document.getElementById("server").textContent = "Served by" + name;
 }
 
 searchForm.addEventListener("submit", (e) => {
@@ -149,7 +152,7 @@ micBtn.addEventListener("click", () => {
     const guesses = Array.from(event.results[0]).map((alt) => alt.transcript);
     const best = guesses
       .map((text) => ({ text, score: getScore(currentWord.word, text) }))
-      .sort((a, b) => (b.score = a.score))[0];
+      .sort((a, b) => b.score - a.score)[0];
 
     const message =
       best.score === 100
@@ -157,7 +160,7 @@ micBtn.addEventListener("click", () => {
         : best.score >= 80
           ? "Very close!"
           : "Try again ";
-    result.innerHTML = `<span class="${best.score >= 80 ? "good" : "bad"}">${best.score}/100</span>}> - ${message}<br>We heard: <b></b>`;
+    result.innerHTML = `<span class="${best.score >= 80 ? "good" : "bad"}">${best.score}/100</span> - ${message}<br>We heard: <b></b>`;
     result.querySelector("b").textContent = best.text;
     saveAttempt(currentWord.word, best.score);
   };
@@ -240,11 +243,11 @@ function showHistory() {
   const filter = document.getElementById("history-filter").value;
   const sort = document.getElementById("history-sort").value;
 
-  letlist = getHistory().filter((h) => h.word.includes(search));
+  let list = getHistory().filter((h) => h.word.includes(search));
   if (filter === "good") list = list.filter((h) => h.best >= 80);
   if (filter === "bad") list = list.filter((h) => h.best < 80);
 
-  if (sort === "date") list.sort((a, b) => (b.date = a.date));
+  if (sort === "date") list.sort((a, b) => b.date - a.date);
   if (sort === "low") list.sort((a, b) => a.best - b.best);
   if (sort === "high") list.sort((a, b) => b.best - a.best);
   if (sort === "az") list.sort((a, b) => a.word.localeCompare(b.word));
@@ -252,10 +255,10 @@ function showHistory() {
   const table = document.getElementById("history");
   table.innerHTML = list.length
     ? ""
-    : '<tr><tdcolspan="4">No words yet. Look up a word and press the mic!</td></tr>';
+    : '<tr><td colspan="4">No words yet. Look up a word and press the mic!</td></tr>';
   list.forEach((h) => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${h.word}</td><td class="${h.best >= 80 ? "good" : "bad"}">${h.best}</td><td>${h.best.attempts}</td><td><button>Practice</button></td>`;
+    row.innerHTML = `<td>${h.word}</td><td class="${h.best >= 80 ? "good" : "bad"}">${h.best}</td><td>${h.attempts}</td><td><button>Practice</button></td>`;
 
     row.querySelector("button").onclick = () => lookUp(h.word);
     table.appendChild(row);
