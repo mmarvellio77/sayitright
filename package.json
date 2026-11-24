@@ -1,7 +1,7 @@
 {
   "name": "sayitright",
   "version": "1.0.0",
-  "description": "Pronounciation coach: Look up English words, hear them, say them, get scored.",
+  "description": "Pronunciation coach: Look up English words, hear them, say them, get scored.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
