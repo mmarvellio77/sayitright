@@ -20,7 +20,7 @@ I love languages: learning them, and especially practising a good accent. When I
 - See the phonetic spelling, meanings and examples
 - Listen to a real recorded pronunciation
 - Translate the word into French, Swahili, Kinyarwanda, Spanish or German
-- Say the word and get a score(0 to 100)
+- Say the word and get a score (0 to 100)
 - Progress table: **search** words, **filter** (mastered / needs practice) and **sort** (newest, lowest score, highest score, A to Z)
 - Clear error messages(word not found, API down,microphone blocked,unsupported browser)
 
@@ -34,7 +34,7 @@ I love languages: learning them, and especially practising a good accent. When I
 
 Neither external API needs an API key.
 
-- **Free Dictionary API** is called directly from the browser (`public/script.js`). It blocks requests from cloud servers such as AWS(see _Challenges_), so the user's browser fetches it.
+- **Free Dictionary API** is called directly from the browser (`public/script.js`). It blocks requests from cloud servers such as AWS (see _Challenges_), so the user's browser fetches it.
 - **MyMemory** is called by our server (server.js), which sends back only the translation. The optional MYMEMORY_EMAIL setting (it raises the daily translation limit) is stored in a .env file, which is listed in .gitignore so it never reaches GitHub.
 
 Built with [Node.js](https://nodejs.org/), [Express](https://expressjs.com/) and [dotenv](https://github.com/motdotla/dotenv).
@@ -89,8 +89,7 @@ Open http://localhost:3000 in Chrome.
              └──┬───┬──┘
                 │   │
          ┌──────▼┐ ┌▼──────┐
-         │ web-01│ │web-02 │  Nginx → Node app (port 3000), kept
-      running by pm2
+         │ web-01│ │web-02 │  Nginx → Node app (port 3000), kept running by pm2
          └───────┘ └───────┘
      18.171.170.245 18.171.175.36
 ```
@@ -110,7 +109,7 @@ git clone https://github.com/mmarvellio77/sayitright.git ~/sayitright && cd ~/sa
 ```
 
 ```bash
-cp .env.example .env && sed -i 's/SERVER_NAME=local/SERVER_NAME=web-01/'.env
+cp .env.example .env && sed -i 's/SERVER_NAME=local/SERVER_NAME=web-01/' .env
 ```
 
 ```bash
@@ -137,32 +136,32 @@ server{
 ```
 
 ```bash
-sudo nginx -t && sudo systenctl reload nginx
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
 Check it works: `curl http://localhost/api/health` should print `{"status":"ok", "server":"web-01"}`.
 
 ### 2. On lb-01(load balancer + HTTPS)
 
-The browser only allows the microphone on **https** pages, so the load balancer(HAProxy) and the SSL certificatenfor `www.mmarvellio.tech` (Let's Encrypt) were already set up in an earlier project, and the domain's A record points to lb-01 (35.179.119.184).
+The browser only allows the microphone on **https** pages, so the load balancer(HAProxy) and the SSL certificate for `www.mmarvellio.tech` (Let's Encrypt) were already set up in an earlier project, and the domain's A record points to lb-01 (35.179.119.184).
 
-The relevant part of `/etc/haproxy//haproxy.cfg`:
+The relevant part of `/etc/haproxy/haproxy.cfg`:
 
 ```
-    frontend http_front
-    bind*;80
-    http-request redirect scheme https code 301 unless { ssl_fc}
+frontend http_front
+    bind *;80
+    http-request redirect scheme https code 301 unless { ssl_fc }
     default_backend web_servers
 
 frontend https_front
-    bind*:443 ssl crt /etc/haproxy/certs/ww/mmarvellio.tech.pem
-    http-requestvset-header X-Forwarded-Proto https
+    bind *:443 ssl crt /etc/haproxy/certs/www/mmarvellio.tech.pem
+    http-request set-header X-Forwarded-Proto https
     default_backend web_servers
 
 backend web_servers
     balance roundrobin
     option httpchk GET /api/health
-    server 7355-web-01 18.171.170.245.:80 check
+    server 7355-web-01 18.171.170.245:80 check
     server 7355-web-02 18.171.175.36:80 check
 ```
 
@@ -190,29 +189,29 @@ cd ~/sayitright && git pull && npm install && pm2 restart sayitright
 ## Error handling
 
 - Word not found → "'xyz' was not found. Check the spelling." (the previous word is hidden so it isn't confusing)
-- Invalid input (numbers, symbols) → "Please type a word using leters only."
+- Invalid input (numbers, symbols) → "Please type a word using letters only."
 - Dictionary or translation API down → a friendly message instead of a crash
 - No internet → "Cannot reach the dictionary. Check your internet."
-- Microphone blocked or nothing heard → a spcific message
-- Browser without peech recognition → warning banner, and the mic button is disabled
+- Microphone blocked or nothing heard → a specific message
+- Browser without speech recognition → warning banner, and the mic button is disabled
 - No recording for a word → the browser reads the word aloud instead
 
 ## Limitations
 
-- **Only common English words.** the Free Dictionary API does not include proper nouns, so names of countries and cities (e.g. _Rwanda_, _Paris_), months and days (e.g. _February_, _Monday_) and abbreviations( *e.g. *NASA*) show "was not found". Some slang (e.g. *gonna*) is also missing. Verb forms and plurals work (e.g. *went*, *running*, *cities*, *children\*).
+- **Only common English words.** the Free Dictionary API does not include proper nouns, so names of countries and cities (e.g. _Rwanda_, _Paris_), months and days (e.g. _February_, _Monday_) and abbreviations( e.g. *NASA*) show "was not found". Some slang (e.g. *gonna*) is also missing. Verb forms and plurals work (e.g. *went*, *running*, *cities*, *children*).
 - **Letters only.** Words with numbers or accented letters (e.g. _café_) are rejected.
 - **English pronunciation only.** The translation shows what the word means in your language to help you understand it, but speaking practice is always in English.
 - **Speech recognition needs Google Chrome or Microsoft Edge** and an internet connection, and works only on https(or localhost).
 - **Similar-sounding words** can be misheard (e.g. _colonel_ as _kernel_). The app keeps the best of 5 guesses, but the score can still be lower than it should be.
 - **Not every word has a recording.** If the dictionary has no audio, the browser's built-in voice reads the word instead.
 - **Translation has a daily limit** on MyMemory's free plan (5000 characters per day, or 50, 000 with an email set in `.env`).
-- **Progress is saved in youe browser only**, so it doesn't follow youy to another device or browser,, and clearing browser data deletes it.
+- **Progress is saved in your browser only**, so it doesn't follow your to another device or browser, and clearing browser data deletes it.
 
 ## Challenges
 
-- **The microphone needs HTTPS.** It worked on localhost but would be blocked on a plan http address. I used the load balancer's existing SSL certificate so the site runs on https.
+- **The microphone needs HTTPS.** It worked on localhost but would be blocked on a plain http address. I used the load balancer's existing SSL certificate so the site runs on https.
 - **The dictionary API blocked my servers (403 Forbidden).** Lookups worked locally but failed on web-01 and web-02. I found the cause in the pm2 error log (`Dictionary API error 403`) and confirmed it with `curl` from the server: the API's Cloudflare protection blocks cloud server addresses, even with a browser User-Agent. I moved the dictionary call to the browser, which is not blocked.
-- **The health check took the site down.** I added the HAProxy health check before the app was deployed, so bothmservers failed it and the site showed "503 Service Unavailable". I removed the check, deployed the app on both servers, confirmed `/api/health` answered, then added the check back.
+- **The health check took the site down.** I added the HAProxy health check before the app was deployed, so both servers failed it and the site showed "503 Service Unavailable". I removed the check, deployed the app on both servers, confirmed `/api/health` answered, then added the check back.
 - **Typos broke the page.** A missing `<script>` tag and small mistakes (`=` instead of `-` in a sort, a route missing its `/`, quotes instead of backticks, a missing variable) made the buttons do nothing. I found them with Chrome's console(Cmd + Option + J) and the server logs.
 - **A suggested word didn't exist.** "february" always showed "not found". Testing the API directly showed it has no month nmaes, so I replaced it with "vegetable" and listed this under _Limitations_.
 - **Scores were too generous.** "through" first scored 88 for "thorough". I squared the similarity so mistakes count more, and only an exact match gets 100.
