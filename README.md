@@ -1,11 +1,11 @@
 # 🎙️ SayItRight: Pronunciation Coach
 
 SayItRight helps English learners pronounce difficult words (like _thorough_ or _colonel_).
-You look up a word, read its meaning, listen to how it sounds, say it intoyour microphone and get a score out of 100.
-Your scores are saved, so you can see which words still needs practice.
+You look up a word, read its meaning, listen to how it sounds, say it into your microphone and get a score out of 100.
+Your scores are saved, so you can see which words still need practice.
 
 - **Live site:** https://www.mmarvellio.tech
-- **Demo video:** https://YOUTUBE-LINK
+- **Demo video:** https://youtu.be/6ftvPWy5thQ
 - **Repository:** https://github.com/mmarvellio77/sayitright
 
 > Use **Google Chrome** or **Microsoft Edge**. Speech recognition doesn't work in FireFox.
@@ -18,10 +18,10 @@ I love languages: learning them, and especially practising a good accent. When I
 
 - Search any English word, or click a suggested "hard" word
 - See the phonetic spelling, meanings and examples
-- Listen to a real recorded pronounciation
+- Listen to a real recorded pronunciation
 - Translate the word into French, Swahili, Kinyarwanda, Spanish or German
 - Say the word and get a score(0 to 100)
-- Progress table: **search** words, **filter** (masteres / needs practice) and **sort** (newest, lowest score, highest score, A to Z)
+- Progress table: **search** words, **filter** (mastered / needs practice) and **sort** (newest, lowest score, highest score, A to Z)
 - Clear error messages(word not found, API down,microphone blocked,unsupported browser)
 
 ## APIs used (credits)
@@ -34,20 +34,20 @@ I love languages: learning them, and especially practising a good accent. When I
 
 Neither external API needs an API key.
 
-- **Free Dictionary API** is called directly from the browser (`public/sript.js`). It blocks requests from cloud servers such as AWS(see _Challenges_), so the user's browser fetches it.
-- The browser never calls them drectly: `server.js` calls them and sends back only the data the page needs. The optional `MYMEMORY_EMAIL` setting (it raises the translation limit) is stored in a `.env` file, which is listed in `.gitignore` so it never reaches GitHub.
+- **Free Dictionary API** is called directly from the browser (`public/script.js`). It blocks requests from cloud servers such as AWS(see _Challenges_), so the user's browser fetches it.
+- **MyMemory** is called by our server (server.js), which sends back only the translation. The optional MYMEMORY_EMAIL setting (it raises the daily translation limit) is stored in a .env file, which is listed in .gitignore so it never reaches GitHub.
 
 Built with [Node.js](https://nodejs.org/), [Express](https://expressjs.com/) and [dotenv](https://github.com/motdotla/dotenv).
 
 ## How the score works
 
-The browser turns your speech into text. The app compares that text with the word usinng the **Levenshtein distance** (the number of the letters you must change to turn one word into the other).
+The browser turns your speech into text. The app compares that text with the word using the **Levenshtein distance** (the number of the letters you must change to turn one word into the other).
 An exact match scores 100, and a close mistake like "through" for "thorough" scores 77.
 
 ## Files
 
 ```
-server.js          Express server + API routes (/api/define, /api/translate, /api/health)
+server.js          Express server + API routes (/api/translate and /api/health)
 public/index.html  Page layout
 public/style.css   Styling
 public/script.js   Search, listen, translate, speech scoring, history
@@ -61,7 +61,7 @@ The app does not use a database. It doesn't need one:
 - **Word meanings, phonetics and audio** come live from the Free Dictionary API.
 - **Translations** come live from the MyMemory API, through our server.
 - **Recently looked-up words** are kept in a small in-memory cache in the page, so looking up the same word again is instant. It resets when the page reloads.
-- **Practice hisstory** (best score, number of attempts) is saved in the browser's **localStorage**, on the user's own computer.
+- **Practice history** (best score, number of attempts) is saved in the browser's **localStorage**, on the user's own computer.
 
 Because nothing is stored on the web servers, they are **stateless**: the load balancer can send any request to web-01 or web-02 and the user sees the same thing. If scores were saved on the servers instead, a score saved on web-01 would be missing when the next request went to web-02.
 
@@ -77,7 +77,7 @@ cp .env.example .env
 npm start
 ```
 
-Open https://localhost:3000 in Chrome.
+Open http://localhost:3000 in Chrome.
 
 ## Deployment
 
@@ -140,7 +140,7 @@ server{
 sudo nginx -t && sudo systenctl reload nginx
 ```
 
-Check it works: `curl https://localhost/api/health` should print `{"status":"ok", "server":"web-01"}`.
+Check it works: `curl http://localhost/api/health` should print `{"status":"ok", "server":"web-01"}`.
 
 ### 2. On lb-01(load balancer + HTTPS)
 
